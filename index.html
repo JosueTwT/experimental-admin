@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🛡️ Admin Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="admin.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+
+    <div id="toast-container"></div>
+
+    <div class="modal-overlay" id="modalConfirm">
+        <div class="modal">
+            <h3>⛔ Zona de Peligro</h3>
+            <p>¿Estás seguro de eliminar esto?</p>
+            <div class="modal-actions">
+                <button class="btn-cancel" onclick="cerrarModal()">Cancelar</button>
+                <button class="btn-delete-confirm" id="btnConfirmDelete">Sí, Borrar</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div id="auth-box" class="card fade-in">
+            <h2>🔒 Acceso Admin</h2>
+            <input type="password" id="passInput" placeholder="Contraseña...">
+            <button class="btn-primary full-width" onclick="entrar()">Entrar</button>
+        </div>
+
+        <div id="admin-content">
+            <header class="admin-header">
+                <h1>Panel de Control</h1>
+                <button class="btn-refresh" onclick="cargarAdmin()">🔄 Actualizar</button>
+            </header>
+
+            <div class="grid-layout">
+                <div class="card">
+                    <h3>📥 Pendientes <span class="badge" id="count-pend">0</span></h3>
+                    <div id="lista-pendientes" class="list-container"></div>
+                </div>
+
+                <div class="card">
+                    <h3>✅ Activas <span class="badge green" id="count-apro">0</span></h3>
+                    <div id="lista-aprobadas" class="list-container"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="admin.js"></script>
+</body>
+</html>

@@ -1,7 +1,7 @@
 const SB_URL = "https://ybbaysmlawnwamcbaent.supabase.co";
 const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InliYmF5c21sYXdud2FtY2JhZW50Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA0ODM0NDMsImV4cCI6MjA4NjA1OTQ0M30.bgnkSZZB3_mMP_kA5Ut5uWuFlSLydWHCkJG0bl-sywg";
 const _supabase = supabase.createClient(SB_URL, SB_KEY);
-const CLAVE = "1234"; 
+const CLAVE = "LOGANTUNER"; 
 let idBorrar = null;
 
 function notificar(msg, tipo = 'success') {
@@ -65,4 +65,5 @@ document.getElementById('btnConfirmDelete').onclick = async () => {
     notificar("Canción Eliminada", "error");
     cerrarModal();
     cargarAdmin();
+
 };

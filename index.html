@@ -36,6 +36,10 @@
                 <button class="btn-refresh" onclick="cargarAdmin()">🔄 Actualizar</button>
             </header>
 
+            <div class="card search-container">
+                <input type="text" id="searchInput" placeholder="🔍 Buscar canción..." onkeyup="filtrarDatos()">
+            </div>
+
             <div class="grid-layout">
                 <div class="card">
                     <h3>📥 Pendientes <span class="badge" id="count-pend">0</span></h3>
@@ -52,6 +56,4 @@
 
     <script src="script.js"></script>
 </body>
-
 </html>
-

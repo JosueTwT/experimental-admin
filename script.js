@@ -1,66 +1,115 @@
-:root {
-    --bg: #f4f7f6;
-    --dark: #2c3e50;
-    --green: #27ae60;
-    --red: #e74c3c;
-    --blue: #3498db;
+const SB_URL = "https://ybbaysmlawnwamcbaent.supabase.co";
+const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InliYmF5c21sYXdud2FtY2JhZW50Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA0ODM0NDMsImV4cCI6MjA4NjA1OTQ0M30.bgnkSZZB3_mMP_kA5Ut5uWuFlSLydWHCkJG0bl-sywg";
+const _supabase = supabase.createClient(SB_URL, SB_KEY);
+
+const CLAVE_MAESTRA = "1234"; 
+let idBorrar = null;
+let todasLasCanciones = []; // Guardaremos los datos aquí para el buscador
+
+// Notificaciones
+function notificar(msg, tipo = 'success') {
+    const container = document.getElementById('toast-container');
+    const div = document.createElement('div');
+    div.className = `toast ${tipo}`;
+    div.innerHTML = `${tipo === 'success' ? '✅' : '❌'} ${msg}`;
+    container.appendChild(div);
+    setTimeout(() => div.remove(), 3000);
 }
 
-body {
-    font-family: 'Outfit', sans-serif;
-    background: var(--bg);
-    margin: 0;
-    padding: 20px;
-    color: var(--dark);
+// Login
+function entrar() {
+    const input = document.getElementById('passInput');
+    if (input.value === CLAVE_MAESTRA) {
+        document.getElementById('auth-box').style.display = 'none';
+        document.getElementById('admin-content').style.display = 'block';
+        cargarAdmin();
+        notificar("Acceso autorizado");
+    } else {
+        notificar("Clave incorrecta", "error");
+        input.value = "";
+    }
 }
 
-.container { max-width: 1000px; margin: 0 auto; }
-.card { background: white; padding: 25px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
-.fade-in { animation: fadeIn 0.5s ease; }
-@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+// Cargar datos de Supabase
+async function cargarAdmin() {
+    const { data: canciones, error } = await _supabase
+        .from('canciones')
+        .select('*')
+        .order('fecha_creacion', { ascending: false });
+    
+    if (error) {
+        notificar("Error al conectar", "error");
+        return;
+    }
 
-input { width: 100%; padding: 12px; margin: 10px 0; border: 2px solid #eee; border-radius: 8px; box-sizing: border-box; outline: none; }
-input:focus { border-color: var(--dark); }
-
-button { border: none; padding: 10px 15px; border-radius: 8px; cursor: pointer; font-weight: 700; transition: 0.2s; }
-button:hover { opacity: 0.8; }
-.full-width { width: 100%; }
-.btn-primary { background: var(--dark); color: white; }
-.btn-refresh { background: var(--blue); color: white; }
-
-#admin-content { display: none; }
-.grid-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px; }
-@media(max-width: 768px) { .grid-layout { grid-template-columns: 1fr; } }
-
-.admin-header { display: flex; justify-content: space-between; align-items: center; }
-
-.search-container { margin-top: 20px; padding: 15px; }
-.search-container input { margin: 0; border-color: #ddd; background: #f9f9f9; }
-.search-container input:focus { background: #fff; border-color: var(--blue); }
-
-.list-container { min-height: 200px; max-height: 500px; overflow-y: auto; }
-.item-row { 
-    display: flex; justify-content: space-between; align-items: center; 
-    padding: 12px; border-bottom: 1px solid #eee; font-size: 0.95rem; 
+    todasLasCanciones = canciones; // Guardamos copia para el buscador
+    renderizarListas(todasLasCanciones);
 }
-.item-row:hover { background: #fafafa; }
-.item-actions { display: flex; gap: 5px; }
 
-.btn-approve { background: var(--green); color: white; padding: 6px 12px; font-size: 0.8rem; }
-.btn-delete { background: var(--red); color: white; padding: 6px 12px; font-size: 0.8rem; }
+// Dibujar las listas en pantalla
+function renderizarListas(listaAMostrar) {
+    const pend = document.getElementById('lista-pendientes');
+    const apro = document.getElementById('lista-aprobadas');
+    pend.innerHTML = ""; apro.innerHTML = "";
+    
+    let countP = 0; let countA = 0;
 
-.badge { background: #eee; padding: 2px 8px; border-radius: 10px; font-size: 0.8rem; margin-left: 5px; }
-.badge.green { background: #d5f5e3; color: #27ae60; }
+    listaAMostrar.forEach(s => {
+        const html = `
+            <div class="item-row fade-in">
+                <span>${s.titulo} <b>(${s.votos_conteo || 0} pts)</b></span>
+                <div class="item-actions">
+                    ${!s.aprobada ? `<button class="btn-approve" onclick="aprobar('${s.id}')">Aprobar</button>` : ''}
+                    <button class="btn-delete" onclick="abrirModal('${s.id}')">🗑</button>
+                </div>
+            </div>`;
+        
+        if (s.aprobada) { apro.innerHTML += html; countA++; }
+        else { pend.innerHTML += html; countP++; }
+    });
 
-#toast-container { position: fixed; top: 20px; right: 20px; z-index: 9999; }
-.toast { background: #333; color: white; padding: 12px 20px; border-radius: 8px; margin-bottom: 10px; animation: slideIn 0.3s; }
-.toast.success { border-left: 4px solid var(--green); }
-.toast.error { border-left: 4px solid var(--red); }
-@keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
+    document.getElementById('count-pend').innerText = countP;
+    document.getElementById('count-apro').innerText = countA;
 
-.modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: none; justify-content: center; align-items: center; backdrop-filter: blur(2px); }
-.modal { background: white; padding: 30px; border-radius: 12px; text-align: center; max-width: 300px; }
-.modal-actions { display: flex; gap: 10px; justify-content: center; margin-top: 20px; }
-.btn-cancel { background: #ccc; color: #333; }
+    if(countP === 0) pend.innerHTML = '<p class="empty-msg">No hay pendientes</p>';
+    if(countA === 0) apro.innerHTML = '<p class="empty-msg">No hay aprobadas</p>';
+}
 
-.btn-delete-confirm { background: var(--red); color: white; }
+// Lógica del Buscador
+function filtrarCanciones() {
+    const busqueda = document.getElementById('searchInput').value.toLowerCase();
+    const filtradas = todasLasCanciones.filter(c => 
+        c.titulo.toLowerCase().includes(busqueda)
+    );
+    renderizarListas(filtradas);
+}
+
+// Aprobar Canción
+async function aprobar(id) {
+    const { error } = await _supabase.from('canciones').update({ aprobada: true }).eq('id', id);
+    if (!error) {
+        notificar("Canción aprobada");
+        cargarAdmin();
+    }
+}
+
+// Modal de Borrado
+function abrirModal(id) {
+    idBorrar = id;
+    document.getElementById('modalConfirm').style.display = 'flex';
+}
+
+function cerrarModal() {
+    document.getElementById('modalConfirm').style.display = 'none';
+}
+
+document.getElementById('btnConfirmDelete').onclick = async () => {
+    const { error } = await _supabase.from('canciones').delete().eq('id', idBorrar);
+    if (!error) {
+        notificar("Eliminado correctamente", "success");
+        cerrarModal();
+        cargarAdmin();
+    } else {
+        notificar("Error al borrar", "error");
+    }
+};

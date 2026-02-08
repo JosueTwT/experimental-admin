@@ -2,7 +2,7 @@ const SB_URL = "https://ybbaysmlawnwamcbaent.supabase.co";
 const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InliYmF5c21sYXdud2FtY2JhZW50Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA0ODM0NDMsImV4cCI6MjA4NjA1OTQ0M30.bgnkSZZB3_mMP_kA5Ut5uWuFlSLydWHCkJG0bl-sywg";
 const _supabase = supabase.createClient(SB_URL, SB_KEY);
 
-const CLAVE_MAESTRA = "1234"; 
+const CLAVE_MAESTRA = "LOGANTUNER"; 
 let idBorrar = null;
 let todasLasCanciones = []; // Guardaremos los datos aquí para el buscador
 
@@ -113,3 +113,4 @@ document.getElementById('btnConfirmDelete').onclick = async () => {
         notificar("Error al borrar", "error");
     }
 };
+
